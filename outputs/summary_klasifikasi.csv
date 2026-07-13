@@ -1,0 +1,4 @@
+Metric,Value
+Training Accuracy,0.9655764966740576
+Testing Accuracy,0.8385809312638581
+ROC-AUC Score,0.8531193720147208
