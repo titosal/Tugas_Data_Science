@@ -13,11 +13,12 @@ from classification import run_classification
 from clustering import run_clustering
 from big_data_simulation import simulate_big_data_streaming
 
-# Setup direktori
-PROJECT_DIR = "D:\\Gacoan\\Tugas_Data_Science"
+# Setup direktori (dinamis mengikuti lokasi file ini)
+PROJECT_DIR = os.path.dirname(os.path.abspath(_file_))
 DATA_PATH = os.path.join(PROJECT_DIR, "dataset", "master_dataset_merged.csv")
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "outputs")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+#dkfj
 
 print("="*80)
 print("MEMULAI RUNNER PIPELINE INTEGRATED DATA SCIENCE")
