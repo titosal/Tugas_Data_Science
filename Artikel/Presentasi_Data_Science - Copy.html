@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentasi Data Science - Mie Gacoan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
+            --gradient-2: linear-gradient(135deg, #f59e0b, #f97316);
+            --gradient-3: linear-gradient(135deg, #10b981, #14b8a6);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #f97316);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Slide Container */
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            background: var(--bg-dark);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .slide.exit-left {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+
+        /* Background patterns */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(245,158,11,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Slide Number */
+        .slide-number {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            z-index: 100;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 0; left: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            transition: width 0.4s ease;
+            z-index: 100;
+            border-radius: 0 2px 2px 0;
+        }
+
+        /* Navigation */
+        .nav-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 40px;
+            font-size: 13px;
+            color: var(--text-muted);
+            z-index: 100;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .nav-hint kbd {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Typography */
+        .slide-title {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .slide-title .gradient-text {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-title .accent-text {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            text-align: center;
+            max-width: 700px;
+            line-height: 1.6;
+        }
+
+        .section-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--primary-light);
+            margin-bottom: 16px;
+        }
+
+        .content-title {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            line-height: 1.2;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .cards-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+        .cards-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .cards-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .card-icon {
+            font-size: 36px;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-value.accent {
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value.success {
+            background: var(--gradient-3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value.danger {
+            background: var(--gradient-danger);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            max-width: 1000px;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .data-table thead th {
+            background: var(--primary-dark);
+            color: white;
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tbody td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .data-table tbody tr:hover td {
+            background: var(--bg-card-hover);
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-positive {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .badge-negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        .badge-neutral {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .badge-excellent {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .bar-label {
+            width: 80px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: right;
+            color: var(--text-secondary);
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 32px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .bar-fill.purple { background: var(--gradient-1); }
+        .bar-fill.amber { background: var(--gradient-2); }
+        .bar-fill.green { background: var(--gradient-3); }
+        .bar-fill.red { background: var(--gradient-danger); }
+
+        /* Pipeline */
+        .pipeline {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            max-width: 1100px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pipeline-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+            min-width: 140px;
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-step:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .pipeline-step .step-num {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .pipeline-step .step-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .pipeline-arrow {
+            font-size: 20px;
+            color: var(--text-muted);
+            padding: 0 6px;
+        }
+
+        /* Lists */
+        .content-list {
+            list-style: none;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .content-list li {
+            padding: 14px 20px;
+            border-left: 3px solid var(--primary);
+            background: var(--bg-card);
+            margin-bottom: 10px;
+            border-radius: 0 10px 10px 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .content-list li:hover {
+            border-left-color: var(--accent);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .content-list li strong {
+            color: var(--text-primary);
+        }
+
+        /* Cluster visualization */
+        .cluster-group {
+            display: flex;
+            gap: 24px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .cluster-card {
+            flex: 1;
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .cluster-card.excellent {
+            background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1));
+            border: 1px solid rgba(99,102,241,0.3);
+        }
+
+        .cluster-card.average {
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(249,115,22,0.1));
+            border: 1px solid rgba(245,158,11,0.3);
+        }
+
+        .cluster-card.underperformer {
+            background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(249,115,22,0.1));
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+
+        .cluster-card .cluster-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cluster-card.excellent .cluster-title { color: #a5b4fc; }
+        .cluster-card.average .cluster-title { color: #fbbf24; }
+        .cluster-card.underperformer .cluster-title { color: #f87171; }
+
+        .cluster-rating {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .cluster-card.excellent .cluster-rating { color: #818cf8; }
+        .cluster-card.average .cluster-rating { color: #f59e0b; }
+        .cluster-card.underperformer .cluster-rating { color: #ef4444; }
+
+        .cluster-branches {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1100px;
+            align-items: start;
+        }
+
+        .col-content h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .col-content p, .col-content li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Formula box */
+        .formula-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            text-align: center;
+            color: var(--accent-light);
+            margin: 16px 0;
+        }
+
+        /* Tag / Chip */
+        .tag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .tag {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        /* Animated dot bg */
+        .floating-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .floating-dots span {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.15;
+            animation: float-dot 20s infinite;
+        }
+
+        @keyframes float-dot {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-30px) translateX(20px); }
+            50% { transform: translateY(-10px) translateX(-15px); }
+            75% { transform: translateY(-40px) translateX(10px); }
+        }
+
+        /* Alert Box */
+        .alert-box {
+            background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(249,115,22,0.05));
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 16px;
+            padding: 24px 32px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .alert-box .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .alert-box .alert-icon {
+            font-size: 28px;
+        }
+
+        .alert-box .alert-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f87171;
+        }
+
+        .alert-box .alert-body {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 24px;
+        }
+
+        /* Author info */
+        .author-info {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .author-info .author-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .author-info .author-affil {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Highlight number */
+        .highlight-num {
+            font-size: 72px;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        /* Image placeholders for charts */
+        .chart-placeholder {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 4/3;
+            background: var(--bg-card);
+            border: 1px dashed var(--border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .fullwidth { width: 100%; max-width: 1100px; }
+
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .mt-8 { margin-top: 8px; }
+        .mt-16 { margin-top: 16px; }
+        .mt-24 { margin-top: 24px; }
+        .mb-8 { margin-bottom: 8px; }
+        .mb-16 { margin-bottom: 16px; }
+        .gap-32 { gap: 32px; }
+    </style>
+</head>
+<body>
+
+<div class="slides-container" id="slidesContainer">
+
+    <!-- ===================== SLIDE 1: COVER ===================== -->
+    <div class="slide active" id="slide-0">
+        <div class="floating-dots">
+            <span style="top:10%;left:15%;animation-delay:0s"></span>
+            <span style="top:30%;left:75%;animation-delay:3s"></span>
+            <span style="top:70%;left:25%;animation-delay:6s"></span>
+            <span style="top:50%;left:85%;animation-delay:9s"></span>
+            <span style="top:85%;left:55%;animation-delay:12s"></span>
+        </div>
+        <div class="slide-content-wrapper">
+            <div class="section-label">Tugas Data Science 2026</div>
+            <h1 class="slide-title">
+                Penerapan <span class="gradient-text">Data Science</span> &
+                <span class="accent-text">Big Data</span> dalam Optimasi E-Business
+            </h1>
+            <p class="slide-subtitle">
+                Studi Kasus: Analisis Reputasi Digital dan Ulasan Pelanggan<br>
+                Rantai Restoran <strong style="color: var(--accent)">Mie Gacoan</strong>
+            </p>
+            <div class="tag-group mt-24">
+                <span class="tag">📊 Data Science</span>
+                <span class="tag">🏪 E-Business</span>
+                <span class="tag">⚡ Big Data</span>
+                <span class="tag">🤖 Machine Learning</span>
+                <span class="tag">🍜 Mie Gacoan</span>
+            </div>
+            <div class="author-info mt-24">
+                <div class="author-name">Nama Penulis</div>
+                <div class="author-affil">Program Studi Sistem Informasi • Universitas XYZ</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 2: AGENDA ===================== -->
+    <div class="slide" id="slide-1">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Outline Presentasi</div>
+            <h2 class="content-title">Agenda <span class="gradient-text">Pembahasan</span></h2>
+            <div class="cards-grid cols-3">
+                <div class="card">
+                    <span class="card-icon">📋</span>
+                    <div class="card-title">1. Pendahuluan</div>
+                    <div class="card-desc">Latar belakang, rumusan masalah, dan tujuan penelitian</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">📚</span>
+                    <div class="card-title">2. Tinjauan Pustaka</div>
+                    <div class="card-desc">Teori data science, e-business, dan big data</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">⚙️</span>
+                    <div class="card-title">3. Metodologi</div>
+                    <div class="card-desc">CRISP-DM pipeline dan spesifikasi dataset</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">📊</span>
+                    <div class="card-title">4. Hasil & Pembahasan</div>
+                    <div class="card-desc">Korelasi, regresi, klasifikasi, clustering, big data</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🎯</span>
+                    <div class="card-title">5. Kesimpulan</div>
+                    <div class="card-desc">Temuan utama dan rekomendasi strategis</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">💻</span>
+                    <div class="card-title">6. Demo Project</div>
+                    <div class="card-desc">Struktur kode Python dan pipeline eksekusi</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 3: LATAR BELAKANG ===================== -->
+    <div class="slide" id="slide-2">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Pendahuluan</div>
+            <h2 class="content-title">Latar <span class="gradient-text">Belakang</span></h2>
+            <div class="two-col">
+                <div class="col-content">
+                    <h3>🔥 Mengapa Penting?</h3>
+                    <ul class="content-list" style="list-style:none; padding:0;">
+                        <li>Mie Gacoan menghasilkan <strong>ribuan ulasan</strong> digital setiap bulan</li>
+                        <li>Reputasi digital secara langsung mempengaruhi <strong>revenue bisnis</strong></li>
+                        <li>Analisis manual terhadap <strong>22.550+ ulasan</strong> adalah mustahil</li>
+                        <li>Diperlukan pendekatan <strong>data science & big data</strong> untuk analisis otomatis</li>
+                    </ul>
+                </div>
+                <div class="col-content">
+                    <h3>❓ Rumusan Masalah</h3>
+                    <ul class="content-list" style="list-style:none; padding:0;">
+                        <li><strong>Volume data besar</strong> — teks tidak terstruktur sulit diproses manual</li>
+                        <li><strong>Inkonsistensi kualitas</strong> — perbedaan performa antar cabang</li>
+                        <li><strong>Pola fluktuasi rating</strong> — akar penyebab belum teranalisis</li>
+                        <li><strong>Respon lambat</strong> — belum ada sistem peringatan dini real-time</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 4: DATASET ===================== -->
+    <div class="slide" id="slide-3">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Metodologi</div>
+            <h2 class="content-title">Spesifikasi <span class="accent-text">Dataset</span></h2>
+            <div class="cards-grid cols-4">
+                <div class="stat-card">
+                    <div class="stat-value">22.550</div>
+                    <div class="stat-label">Total Ulasan</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value accent">20</div>
+                    <div class="stat-label">Cabang Restoran</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success">4</div>
+                    <div class="stat-label">Wilayah (Jabodetabek)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value danger">6</div>
+                    <div class="stat-label">Atribut Data</div>
+                </div>
+            </div>
+            <table class="data-table mt-24">
+                <thead>
+                    <tr>
+                        <th>Atribut</th>
+                        <th>Tipe Data</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Lokasi</strong></td><td>String</td><td>Nama cabang restoran</td></tr>
+                    <tr><td><strong>Rating</strong></td><td>Integer (1–5)</td><td>Nilai bintang ulasan</td></tr>
+                    <tr><td><strong>Review</strong></td><td>String</td><td>Teks ulasan pelanggan</td></tr>
+                    <tr><td><strong>Sentimen</strong></td><td>String</td><td>Label: Positif / Negatif / Netral</td></tr>
+                    <tr><td><strong>Umur Komentar</strong></td><td>Integer</td><td>Selisih hari hingga 30 Juni 2026</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 5: PIPELINE ===================== -->
+    <div class="slide" id="slide-4">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Metodologi</div>
+            <h2 class="content-title">Pipeline <span class="gradient-text">Data Science</span></h2>
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <div class="step-num">Fase 1</div>
+                    <div class="step-title">🗃️ Data<br>Management</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-num">Fase 2</div>
+                    <div class="step-title">🔗 Korelasi &<br>Asosiasi</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-num">Fase 3</div>
+                    <div class="step-title">📈 Analisis<br>Regresi</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-num">Fase 4</div>
+                    <div class="step-title">🎯 Klasifikasi<br>Data</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-num">Fase 5</div>
+                    <div class="step-title">🔬 Clustering<br>Data</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-num">Fase 6</div>
+                    <div class="step-title">⚡ Big Data<br>Streaming</div>
+                </div>
+            </div>
+            <div class="tag-group mt-24">
+                <span class="tag">Python 3.x</span>
+                <span class="tag">Pandas</span>
+                <span class="tag">NumPy</span>
+                <span class="tag">Scikit-learn</span>
+                <span class="tag">Matplotlib</span>
+                <span class="tag">Seaborn</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 6: KORELASI ===================== -->
+    <div class="slide" id="slide-5">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Hasil & Pembahasan</div>
+            <h2 class="content-title">Analisis <span class="gradient-text">Korelasi</span> & Asosiasi</h2>
+            <div class="two-col">
+                <div>
+                    <h3 style="font-size:18px; font-weight:700; margin-bottom:16px; color: var(--text-primary);">Korelasi Rating vs Teks Review</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Fitur</th><th>Pearson (r)</th><th>Arah</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>panjang_review</td><td style="color:#f87171;font-weight:700">-0,3919</td><td><span class="badge badge-negative">Negatif</span></td></tr>
+                            <tr><td>jumlah_kata</td><td style="color:#f87171;font-weight:700">-0,4101</td><td><span class="badge badge-negative">Negatif</span></td></tr>
+                            <tr><td>ada_tanda_seru</td><td style="color:#f87171">-0,1370</td><td><span class="badge badge-negative">Negatif</span></td></tr>
+                            <tr><td>ada_tanda_tanya</td><td style="color:#f87171">-0,2181</td><td><span class="badge badge-negative">Negatif</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3 style="font-size:18px; font-weight:700; margin-bottom:16px; color: var(--text-primary);">Insight Utama</h3>
+                    <div class="alert-box" style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05)); border-color: rgba(99,102,241,0.3);">
+                        <div class="alert-header">
+                            <span class="alert-icon">💡</span>
+                            <span class="alert-title" style="color: #a5b4fc;">Temuan Kunci</span>
+                        </div>
+                        <div class="alert-body">
+                            Pelanggan yang <strong>kecewa</strong> menulis ulasan yang <strong>lebih panjang dan detail</strong> (ventilasi emosi). Pelanggan <strong>puas</strong> cenderung menulis singkat: <em>"enak cepat ramah"</em>.
+                        </div>
+                    </div>
+                    <div class="mt-16">
+                        <div style="font-size:14px; color: var(--text-muted); margin-bottom:8px;">Top Driver Positif:</div>
+                        <div class="tag-group" style="justify-content:flex-start;">
+                            <span class="tag" style="border-color: #34d399; color: #34d399;">🍜 enak (+0.29)</span>
+                            <span class="tag" style="border-color: #34d399; color: #34d399;">😊 ramah (+0.21)</span>
+                            <span class="tag" style="border-color: #34d399; color: #34d399;">⚡ cepat (+0.14)</span>
+                        </div>
+                        <div style="font-size:14px; color: var(--text-muted); margin-bottom:8px; margin-top:12px;">Top Driver Negatif:</div>
+                        <div class="tag-group" style="justify-content:flex-start;">
+                            <span class="tag" style="border-color: #f87171; color: #f87171;">⏰ lama (-0.27)</span>
+                            <span class="tag" style="border-color: #f87171; color: #f87171;">🪑 meja (-0.21)</span>
+                            <span class="tag" style="border-color: #f87171; color: #f87171;">🅿️ parkir (-0.13)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 7: REGRESI ===================== -->
+    <div class="slide" id="slide-6">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Hasil & Pembahasan</div>
+            <h2 class="content-title">Analisis <span class="accent-text">Regresi</span> & Seasonality</h2>
+            <div class="two-col">
+                <div>
+                    <h3 style="font-size:18px; font-weight:700; margin-bottom:16px;">Model Regresi Linear</h3>
+                    <div class="formula-box">
+                        Rating = 4,4535 − 0,000713 × Umur
+                    </div>
+                    <div class="cards-grid cols-2 mt-16">
+                        <div class="stat-card">
+                            <div class="stat-value" style="font-size:32px;">R² = 0,0234</div>
+                            <div class="stat-label">Koefisien Determinasi</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value success" style="font-size:32px;">+0,26 ⭐</div>
+                            <div class="stat-label">Peningkatan/Tahun</div>
+                        </div>
+                    </div>
+                    <p style="font-size:13px; color:var(--text-muted); margin-top:12px; line-height:1.6;">
+                        Faktor waktu hanya menjelaskan 2,34% variabilitas rating → rating lebih dipengaruhi faktor operasional riil.
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-size:18px; font-weight:700; margin-bottom:16px;">Pola Musiman Harian</h3>
+                    <div class="bar-chart">
+                        <div class="bar-row">
+                            <span class="bar-label">Kamis</span>
+                            <div class="bar-track"><div class="bar-fill green" style="width:90%">4,49 ⭐</div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Selasa</span>
+                            <div class="bar-track"><div class="bar-fill green" style="width:88%">4,44</div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Jumat</span>
+                            <div class="bar-track"><div class="bar-fill purple" style="width:86%">4,35</div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Sabtu</span>
+                            <div class="bar-track"><div class="bar-fill purple" style="width:85%">4,30</div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Rabu</span>
+                            <div class="bar-track"><div class="bar-fill amber" style="width:84%">4,29</div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Senin</span>
+                            <div class="bar-track"><div class="bar-fill red" style="width:80%">4,06</div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Minggu</span>
+                            <div class="bar-track"><div class="bar-fill red" style="width:79%">4,03 ⚠️</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 8: KLASIFIKASI ===================== -->
+    <div class="slide" id="slide-7">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Hasil & Pembahasan</div>
+            <h2 class="content-title"><span class="gradient-text">Klasifikasi</span> Random Forest</h2>
+            <div class="cards-grid cols-3 mb-16">
+                <div class="stat-card">
+                    <div class="stat-value">83,86%</div>
+                    <div class="stat-label">Akurasi Model</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value accent">85,31%</div>
+                    <div class="stat-label">ROC-AUC Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success">4.510</div>
+                    <div class="stat-label">Data Uji (20%)</div>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Kelas</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-negative">Bad (1-3) ⭐</span></td>
+                        <td>0,63</td><td>0,56</td><td>0,59</td><td>946</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-positive">Good (4-5) ⭐</span></td>
+                        <td>0,89</td><td>0,91</td><td>0,90</td><td>3.564</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="alert-box mt-16" style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(20,184,166,0.05)); border-color: rgba(16,185,129,0.3);">
+                <div class="alert-header">
+                    <span class="alert-icon">✅</span>
+                    <span class="alert-title" style="color: #34d399;">Performa Baik</span>
+                </div>
+                <div class="alert-body">
+                    Model mampu membedakan ulasan positif vs negatif dengan diskriminasi yang andal (ROC-AUC > 85%).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 9: CLUSTERING ===================== -->
+    <div class="slide" id="slide-8">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Hasil & Pembahasan</div>
+            <h2 class="content-title"><span class="gradient-text">Clustering</span> Performa Cabang (K-Means, K=3)</h2>
+            <div class="cluster-group">
+                <div class="cluster-card excellent">
+                    <div class="cluster-title">🏆 Excellent</div>
+                    <div class="cluster-rating">4,41</div>
+                    <div style="font-size:14px; color: var(--text-secondary);">Avg Rating • Std Dev: 1,27</div>
+                    <div class="cluster-branches">
+                        Bekasi (Babelan, Sultan Agung, Harapan Indah),<br>
+                        Jakarta (6 cabang), Bogor (3 cabang), Depok-Sawangan
+                    </div>
+                    <div style="margin-top:12px"><span class="badge badge-excellent">13 Cabang</span></div>
+                </div>
+                <div class="cluster-card average">
+                    <div class="cluster-title">📊 Average</div>
+                    <div class="cluster-rating">3,97</div>
+                    <div style="font-size:14px; color: var(--text-secondary);">Avg Rating • Std Dev: 1,53</div>
+                    <div class="cluster-branches">
+                        Bogor-Pusat, Depok-Kelapa Dua,<br>
+                        Depok-Pusat
+                    </div>
+                    <div style="margin-top:12px"><span class="badge badge-neutral">3 Cabang</span></div>
+                </div>
+                <div class="cluster-card underperformer">
+                    <div class="cluster-title">⚠️ Underperformer</div>
+                    <div class="cluster-rating">3,71</div>
+                    <div style="font-size:14px; color: var(--text-secondary);">Avg Rating • Std Dev: 1,70</div>
+                    <div class="cluster-branches">
+                        Bintaro, Boulevard Kelapa Gading,<br>
+                        <strong style="color:#f87171">Cimone (3,42 ⭐ — Terburuk)</strong>
+                    </div>
+                    <div style="margin-top:12px"><span class="badge badge-negative">3 Cabang — Prioritas!</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 10: KAUSALITAS ===================== -->
+    <div class="slide" id="slide-9">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Hasil & Pembahasan</div>
+            <h2 class="content-title">Analisis <span class="accent-text">Kausalitas</span> (ATE)</h2>
+            <div class="cards-grid cols-3 mb-16">
+                <div class="stat-card" style="border-color: rgba(239,68,68,0.3);">
+                    <div style="font-size:16px; font-weight:600; color: var(--text-muted); margin-bottom:8px;">🅿️ Masalah Parkir</div>
+                    <div class="stat-value danger" style="font-size:36px;">-0,84 ⭐</div>
+                    <div class="stat-label">Dampak Negatif pada Rating</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(16,185,129,0.3);">
+                    <div style="font-size:16px; font-weight:600; color: var(--text-muted); margin-bottom:8px;">😊 Keramahan Staf</div>
+                    <div class="stat-value success" style="font-size:36px;">+0,74 ⭐</div>
+                    <div class="stat-label">Dampak Positif pada Rating</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(99,102,241,0.3);">
+                    <div style="font-size:16px; font-weight:600; color: var(--text-muted); margin-bottom:8px;">⚡ Kecepatan Layanan</div>
+                    <div class="stat-value" style="font-size:36px;">+0,67 ⭐</div>
+                    <div class="stat-label">Dampak Positif pada Rating</div>
+                </div>
+            </div>
+            <div class="alert-box">
+                <div class="alert-header">
+                    <span class="alert-icon">🎯</span>
+                    <span class="alert-title">Simulasi Counterfactual</span>
+                </div>
+                <div class="alert-body">
+                    <strong>Baseline Rating:</strong> 4,203 → 
+                    <strong>Jika parkir diatasi 100%:</strong> 4,248 (+0,045) → 
+                    <strong>Jika keramahan ditingkatkan:</strong> 4,281 (+0,078)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 11: BIG DATA ===================== -->
+    <div class="slide" id="slide-10">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Hasil & Pembahasan</div>
+            <h2 class="content-title">Simulasi <span class="accent-text">Big Data</span> Streaming</h2>
+            <div class="pipeline" style="gap:0;">
+                <div class="pipeline-step" style="min-width:160px;">
+                    <div class="step-num">Source</div>
+                    <div class="step-title">📱 Google Reviews<br>Stream API</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" style="min-width:160px;">
+                    <div class="step-num">Ingestion</div>
+                    <div class="step-title">📤 Kafka<br>Producer</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" style="min-width:160px; border-color: var(--primary);">
+                    <div class="step-num">Broker</div>
+                    <div class="step-title">🔄 Apache Kafka<br>Message Queue</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" style="min-width:160px;">
+                    <div class="step-num">Processing</div>
+                    <div class="step-title">⚡ Spark Streaming<br>Consumer</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" style="min-width:160px; border-color: var(--danger);">
+                    <div class="step-num">Action</div>
+                    <div class="step-title">🚨 Alert System<br>< 3 detik</div>
+                </div>
+            </div>
+            <div class="alert-box mt-24" style="max-width:900px;">
+                <div class="alert-header">
+                    <span class="alert-icon">🚨</span>
+                    <span class="alert-title">Contoh Real-time Alert</span>
+                </div>
+                <div class="alert-body">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-top:8px;">
+                        <div style="color: var(--accent);">[PRODUSEN] Event terkirim: Cabang Cimone, Rating 1</div>
+                        <div style="color: #f87171; margin-top:6px;">[KONSUMEN - ALERT] ⚠️ Deteksi Rating Buruk di Cabang Cimone (Rating 1)</div>
+                        <div style="color: var(--text-muted); margin-top:4px;">→ Memicu notifikasi service recovery dalam &lt; 3 detik</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 12: KESIMPULAN ===================== -->
+    <div class="slide" id="slide-11">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Kesimpulan</div>
+            <h2 class="content-title">Temuan <span class="gradient-text">Utama</span></h2>
+            <div class="cards-grid cols-2">
+                <div class="card">
+                    <span class="card-icon">🔗</span>
+                    <div class="card-title">Korelasi Negatif</div>
+                    <div class="card-desc">Pelanggan kecewa menulis ulasan lebih panjang (r = -0,3919). Semua p-value < 0,0001.</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">📈</span>
+                    <div class="card-title">Tren & Seasonality</div>
+                    <div class="card-desc">Rating meningkat +0,26/tahun. Minggu = hari terburuk (4,03) akibat overload kapasitas.</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🎯</span>
+                    <div class="card-title">Klasifikasi Akurat</div>
+                    <div class="card-desc">Random Forest: Akurasi 83,86%, ROC-AUC 85,31%. Model andal untuk prediksi sentimen.</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🔬</span>
+                    <div class="card-title">3 Cluster Performa</div>
+                    <div class="card-desc">Cimone = cabang terburuk (3,42⭐). Perlu intervensi segera dari manajemen.</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">⚖️</span>
+                    <div class="card-title">Dampak Kausal</div>
+                    <div class="card-desc">Parkir turunkan -0,84⭐. Keramahan naik +0,74⭐. Bukti kuat untuk intervensi operasional.</div>
+                </div>
+                <div class="card">
+                    <span class="card-icon">⚡</span>
+                    <div class="card-title">Big Data Real-Time</div>
+                    <div class="card-desc">Sistem streaming mampu deteksi ulasan negatif < 3 detik untuk service recovery instan.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 13: REKOMENDASI ===================== -->
+    <div class="slide" id="slide-12">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Saran</div>
+            <h2 class="content-title">Rekomendasi <span class="accent-text">Strategis</span></h2>
+            <ul class="content-list fullwidth" style="max-width:900px;">
+                <li>
+                    <strong>🚨 Minggu 1 — Intervensi Darurat Cabang Cimone:</strong>
+                    Kirim tim audit operasional, adopsi SOP dari cabang terbaik (Bekasi-Babelan)
+                </li>
+                <li>
+                    <strong>🅿️ Minggu 1-2 — Solusi Parkir:</strong>
+                    Kerjasama penyedia lahan sekitar atau layanan valet parkir murah
+                </li>
+                <li>
+                    <strong>👥 Bulan 1 — Optimasi Staffing Akhir Pekan:</strong>
+                    Tambah kapasitas staf kasir & kru dapur di hari Sabtu-Minggu
+                </li>
+                <li>
+                    <strong>😊 Bulan 1 — Pelatihan Keramahan:</strong>
+                    Program hospitality berkala untuk staf garda depan (kasir & penyaji)
+                </li>
+                <li>
+                    <strong>📊 Kuartal 1 — Dasbor Big Data Streaming:</strong>
+                    Implementasi monitoring real-time Kafka-Spark untuk deteksi keluhan otomatis
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 14: PROJECT STRUCTURE ===================== -->
+    <div class="slide" id="slide-13">
+        <div class="slide-content-wrapper">
+            <div class="section-label">Demo Project</div>
+            <h2 class="content-title">Struktur <span class="gradient-text">Proyek</span> Python</h2>
+            <div class="two-col">
+                <div>
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 2;">
+                        <span style="color: var(--accent);">📁 Tugas_Data_Science/</span><br>
+                        ├── 📁 <span style="color: var(--primary-light);">dataset/</span><br>
+                        │&nbsp;&nbsp; └── master_dataset_merged.csv<br>
+                        ├── 📁 <span style="color: var(--primary-light);">outputs/</span><br>
+                        │&nbsp;&nbsp; ├── *.csv (hasil analisis)<br>
+                        │&nbsp;&nbsp; ├── *.png (visualisasi)<br>
+                        │&nbsp;&nbsp; └── *.pkl (model tersimpan)<br>
+                        ├── <span style="color: #34d399;">data_management.py</span><br>
+                        ├── <span style="color: #34d399;">association_correlation.py</span><br>
+                        ├── <span style="color: #34d399;">regression_analysis.py</span><br>
+                        ├── <span style="color: #34d399;">classification.py</span><br>
+                        ├── <span style="color: #34d399;">clustering.py</span><br>
+                        ├── <span style="color: #34d399;">big_data_simulation.py</span><br>
+                        ├── <span style="color: #fbbf24;">run_project.py</span><br>
+                        ├── 📄 Makalah_Data_Science.md<br>
+                        └── 📄 README.md
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size:18px; font-weight:700; margin-bottom:16px;">Cara Menjalankan</h3>
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 2.2;">
+                        <span style="color: var(--text-muted);"># Install dependencies</span><br>
+                        <span style="color: #34d399;">$</span> pip install pandas numpy matplotlib seaborn scikit-learn<br><br>
+                        <span style="color: var(--text-muted);"># Jalankan pipeline</span><br>
+                        <span style="color: #34d399;">$</span> python run_project.py
+                    </div>
+                    <div class="mt-16">
+                        <h3 style="font-size:18px; font-weight:700; margin-bottom:12px;">Output yang Dihasilkan</h3>
+                        <div class="tag-group" style="justify-content:flex-start; gap:6px;">
+                            <span class="tag" style="font-size:12px;">📊 heatmap_korelasi.png</span>
+                            <span class="tag" style="font-size:12px;">📈 analisis_regresi_tren.png</span>
+                            <span class="tag" style="font-size:12px;">🎯 klasifikasi_model_evaluasi.png</span>
+                            <span class="tag" style="font-size:12px;">🔬 cluster_cabang_scatter.png</span>
+                            <span class="tag" style="font-size:12px;">⚡ simulasi_stream_log.json</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SLIDE 15: TERIMA KASIH ===================== -->
+    <div class="slide" id="slide-14">
+        <div class="floating-dots">
+            <span style="top:15%;left:20%;animation-delay:1s"></span>
+            <span style="top:35%;left:70%;animation-delay:4s"></span>
+            <span style="top:65%;left:30%;animation-delay:7s"></span>
+            <span style="top:55%;left:80%;animation-delay:10s"></span>
+        </div>
+        <div class="slide-content-wrapper">
+            <div class="highlight-num">🙏</div>
+            <h1 class="slide-title" style="font-size:56px;">
+                Terima <span class="gradient-text">Kasih</span>
+            </h1>
+            <p class="slide-subtitle">
+                Sesi Tanya Jawab & Diskusi
+            </p>
+            <div class="tag-group mt-24">
+                <span class="tag">📧 penulis@university.ac.id</span>
+                <span class="tag">🔗 github.com/username/tugas-data-science</span>
+            </div>
+            <div style="margin-top:32px; text-align:center;">
+                <div style="font-size:14px; color: var(--text-muted);">Link Video Presentasi YouTube</div>
+                <div style="font-size:16px; color: var(--primary-light); font-weight:600; margin-top:6px;">
+                    [Masukkan link YouTube setelah recording Zoom]
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Navigation UI -->
+<div class="slide-number" id="slideNumber">1 / 15</div>
+<div class="progress-bar" id="progressBar" style="width: 6.67%"></div>
+<div class="nav-hint">
+    <kbd>←</kbd> <kbd>→</kbd> atau <kbd>Space</kbd> untuk navigasi
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    function goToSlide(index) {
+        if (index < 0 || index >= totalSlides) return;
+
+        slides[currentSlide].classList.remove('active');
+        slides[currentSlide].classList.add('exit-left');
+
+        setTimeout(() => {
+            slides[currentSlide].classList.remove('exit-left');
+        }, 600);
+
+        currentSlide = index;
+        slides[currentSlide].classList.add('active');
+
+        // Update UI
+        document.getElementById('slideNumber').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+            e.preventDefault();
+            prevSlide();
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            goToSlide(0);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            goToSlide(totalSlides - 1);
+        }
+    });
+
+    // Touch/swipe support
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    document.addEventListener('touchend', (e) => {
+        const diff = touchStartX - e.changedTouches[0].screenX;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) nextSlide();
+            else prevSlide();
+        }
+    });
+
+    // Click navigation (left/right halves)
+    document.addEventListener('click', (e) => {
+        if (e.clientX > window.innerWidth * 0.65) nextSlide();
+        else if (e.clientX < window.innerWidth * 0.35) prevSlide();
+    });
+</script>
+
+</body>
+</html>
